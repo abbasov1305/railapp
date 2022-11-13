@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rail_app/providers/auth_provider.dart';
+import 'package:rail_app/providers/base_provider.dart';
+import 'package:lottie/lottie.dart';
 
 class AddWidget extends StatefulWidget {
   @override
@@ -10,13 +11,14 @@ class AddWidget extends StatefulWidget {
 class _AddWidgetState extends State<AddWidget> {
   final _textController = TextEditingController();
   bool _isShared = false;
+  bool _isEnable = false;
 
   void _shareText() {
     try {
       setState(() {
         _isShared = true;
       });
-      Provider.of<AuthProvider>(context, listen: false)
+      Provider.of<BaseProvider>(context, listen: false)
           .addText(_textController.text, context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -41,8 +43,19 @@ class _AddWidgetState extends State<AddWidget> {
       child: SingleChildScrollView(
         child: Column(
           children: [
+            Lottie.network(
+              'https://assets6.lottiefiles.com/private_files/lf30_ajpz5zar.json',
+              animate: _isEnable ? true : false,
+            ),
             TextField(
               controller: _textController,
+              onChanged: (value) => setState(() {
+                if (value.isEmpty) {
+                  _isEnable = false;
+                } else {
+                  _isEnable = true;
+                }
+              }),
               decoration: InputDecoration(
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Theme.of(context).accentColor),
@@ -54,10 +67,9 @@ class _AddWidgetState extends State<AddWidget> {
               maxLines: 6,
             ),
             SizedBox(height: 20),
-            if (!_isShared)
+            if (!_isShared && _isEnable)
               OutlinedButton.icon(
-                onPressed:
-                    _textController.text.trim() == null ? null : _shareText,
+                onPressed: _shareText,
                 icon: Icon(Icons.public),
                 label: Text('share'),
               ),

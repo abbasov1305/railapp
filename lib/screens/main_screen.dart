@@ -56,11 +56,11 @@ class _MainScreenState extends State<MainScreen> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle),
+            icon: Icon(Icons.control_point),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.face_sharp),
+            icon: Icon(Icons.settings_outlined),
             label: '',
           ),
         ],

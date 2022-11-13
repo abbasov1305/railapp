@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:rail_app/providers/auth_provider.dart';
+import 'package:rail_app/providers/base_provider.dart';
 import 'firebase_options.dart';
 import './screens/main_screen.dart';
 import './screens/auth_screen.dart';
@@ -20,11 +20,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+      create: (context) => BaseProvider(),
       builder: (context, child) => MaterialApp(
         title: 'rail app',
         debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.light,
         theme: ThemeData(
           accentColor: Colors.blue[900],
           //scaffoldBackgroundColor: Colors.lightBlue,
@@ -32,13 +31,13 @@ class MyApp extends StatelessWidget {
             primary: Colors.lightBlue[900],
           ),
         ),
-        darkTheme: ThemeData(
-          // colorScheme: ColorScheme.light().copyWith(
-          //   primary: Color.fromARGB(255, 0, 21, 37),
-          // ),
-          colorScheme: ColorScheme.dark(),
-          // scaffoldBackgroundColor: Color.fromARGB(255, 1, 39, 68),
+        darkTheme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: Color.fromARGB(255, 18, 28, 37),
+          canvasColor: Color.fromARGB(255, 14, 22, 29),
+          primaryColor: Colors.blue[900],
+          accentColor: Color.fromARGB(255, 1, 42, 105),
         ),
+        themeMode: BaseProvider().getCurrentTheme(),
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
@@ -48,6 +47,7 @@ class MyApp extends StatelessWidget {
               );
             }
             if (snapshot.hasData) {
+              BaseProvider().loadData();
               return MainScreen();
             }
             return AuthScreen();

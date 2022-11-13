@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/user_image_picker.dart';
-import '../providers/auth_provider.dart';
+import '../providers/base_provider.dart';
 import 'package:provider/provider.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -28,10 +28,10 @@ class _AuthScreenState extends State<AuthScreen> {
     if (validate == null) return;
     try {
       if (_isLoggin) {
-        await Provider.of<AuthProvider>(context, listen: false)
+        await Provider.of<BaseProvider>(context, listen: false)
             .signIn(email!, password!, context);
       } else {
-        Provider.of<AuthProvider>(context, listen: false)
+        Provider.of<BaseProvider>(context, listen: false)
             .signUp(email!, password!, username!, 'imageUrl', context);
       }
     } catch (e) {
