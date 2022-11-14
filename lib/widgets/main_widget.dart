@@ -45,12 +45,12 @@ class _MainWidgetState extends State<MainWidget> {
           '@$username',
           textAlign: TextAlign.center,
         ),
-        actions: [
-          IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(Icons.flip_to_back_rounded),
-              color: Theme.of(context).primaryColor),
-        ],
+        // actions: [
+        //   IconButton(
+        //       onPressed: () => Navigator.of(context).pop(),
+        //       icon: Icon(Icons.flip_to_back_rounded),
+        //       color: Theme.of(context).primaryColor),
+        // ],
         //backgroundColor: Colors.transparent,
       ),
     );
@@ -162,6 +162,7 @@ class _MainWidgetState extends State<MainWidget> {
                     ),
                     child: Column(
                       children: [
+                        SizedBox(height: 6),
                         StreamBuilder(
                           stream: FirebaseFirestore.instance
                               .collection('users')
@@ -180,6 +181,7 @@ class _MainWidgetState extends State<MainWidget> {
                                   _userData['imageUrl'], _userData['username']),
                               child: Row(
                                 children: [
+                                  SizedBox(width: 6),
                                   CircleAvatar(
                                     radius: 12,
                                     backgroundImage: NetworkImage(
@@ -189,7 +191,14 @@ class _MainWidgetState extends State<MainWidget> {
                                   SizedBox(
                                     width: 12,
                                   ),
-                                  Text(_userData['username']),
+                                  Text(
+                                    _userData['username'],
+                                    style: TextStyle(
+                                      //fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      //color: Theme.of(context).accentColor,
+                                    ),
+                                  ),
                                 ],
                               ),
                             );
@@ -198,7 +207,9 @@ class _MainWidgetState extends State<MainWidget> {
                         SizedBox(
                           height: 12,
                         ),
-                        Text(data![index]['text']),
+                        Text(
+                          data![index]['text'],
+                        ),
                         CreatedTime(data![index]['createdAt']),
                         SizedBox(
                           height: 6,

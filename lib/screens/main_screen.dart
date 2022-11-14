@@ -38,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: Container(
         child: _selectedWidget,
       ),
       bottomNavigationBar: BottomNavigationBar(

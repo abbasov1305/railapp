@@ -3,14 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rail_app/screens/main_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 class BaseProvider with ChangeNotifier {
-  bool _bIsDark = false;
+  bool bIsDark = false;
+  BaseProvider(this.bIsDark);
 
   Future<void> signIn(String email, String password, BuildContext ctx) async {
     try {
       final authResult = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+      _saveLooginData(email, password);
     } catch (e) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         content: Text(
@@ -28,7 +32,7 @@ class BaseProvider with ChangeNotifier {
     String email,
     String password,
     String username,
-    String imageUrl,
+    File _userImage,
     BuildContext ctx,
   ) async {
     try {
@@ -36,6 +40,13 @@ class BaseProvider with ChangeNotifier {
           .createUserWithEmailAndPassword(email: email, password: password);
 
       if (authResult == null) return print('auth result is null');
+
+      final ref = await FirebaseStorage.instance
+          .ref()
+          .child('usere_images')
+          .child(authResult.user!.uid + '.jpg');
+      await ref.putFile(_userImage);
+      String imageUrl = await ref.getDownloadURL();
 
       await FirebaseFirestore.instance
           .collection('users')
@@ -46,6 +57,8 @@ class BaseProvider with ChangeNotifier {
         'username': username,
         'imageUrl': imageUrl,
       });
+
+      _saveLooginData(email, password);
     } catch (e) {
       ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
         content: Text(
@@ -60,6 +73,7 @@ class BaseProvider with ChangeNotifier {
 
   void signOut() {
     FirebaseAuth.instance.signOut();
+    _deleteLooginData();
     notifyListeners();
   }
 
@@ -93,25 +107,28 @@ class BaseProvider with ChangeNotifier {
   }
 
   void switchTheme() {
-    _bIsDark = !_bIsDark;
-    _saveData();
-    notifyListeners();
+    bIsDark = !bIsDark;
+    _saveThemeData();
+    //notifyListeners();
   }
 
   ThemeMode getCurrentTheme() {
-    return _bIsDark ? ThemeMode.dark : ThemeMode.light;
+    return bIsDark ? ThemeMode.dark : ThemeMode.light;
   }
 
-  void _saveData() async {
+  void _saveThemeData() async {
     await SharedPreferences.getInstance()
-        .then((value) => value.setBool('bIsDark', _bIsDark));
+        .then((value) => value.setBool('bIsDark', bIsDark));
+    notifyListeners();
   }
 
-  void loadData() async {
-    await SharedPreferences.getInstance().then((value) {
-      if (value.getBool('bIsDark') != null) {
-        _bIsDark = value.getBool('bIsDark')!;
-      }
-    });
+  void _saveLooginData(String email, String password) async {
+    await SharedPreferences.getInstance()
+        .then((value) => value.setStringList('loogin', [email, password]));
+  }
+
+  void _deleteLooginData() async {
+    await SharedPreferences.getInstance()
+        .then((value) => value.getStringList('loogin')!.clear());
   }
 }
