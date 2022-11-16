@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
@@ -16,23 +18,33 @@ void main() async {
 
   SharedPreferences pref = await SharedPreferences.getInstance();
   bool bIsDark = false;
-  List<String>? looginData;
+
   if (pref != null) {
     if (pref.getBool('bIsDark') != null) {
       bIsDark = pref.getBool('bIsDark')!;
     }
-    if (pref.getStringList('loogin') != null) {
-      looginData = pref.getStringList('loogin');
-    }
   }
 
-  runApp(MyApp(bIsDark != null ? bIsDark : false, looginData));
+  runApp(MyApp(bIsDark != null ? bIsDark : false));
+}
+
+List<String>? newLooginData;
+Future<void> getLooginData() async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  if (pref != null) {
+    if (pref.getStringList('loogin') != null) {
+      newLooginData = pref.getStringList('loogin');
+    }
+    newLooginData = null;
+  }
+
+  newLooginData = null;
 }
 
 class MyApp extends StatelessWidget {
   bool bIsDark;
-  List<String>? looginData;
-  MyApp(this.bIsDark, this.looginData);
+
+  MyApp(this.bIsDark);
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -43,7 +55,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           accentColor: Colors.blue[900],
           colorScheme: ColorScheme.light().copyWith(
-            primary: Colors.lightBlue[900],
+            primary: Colors.blue[600],
           ),
           fontFamily: 'R4',
         ),
@@ -68,9 +80,10 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData) {
               return MainScreen();
             }
-            if (looginData != null) {
+            getLooginData();
+            if (newLooginData != null) {
               Provider.of<BaseProvider>(context)
-                  .signIn(looginData![0], looginData![1], context);
+                  .signIn(newLooginData![0], newLooginData![1], context);
             }
             return AuthScreen();
           },

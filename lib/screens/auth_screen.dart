@@ -40,6 +40,16 @@ class _AuthScreenState extends State<AuthScreen> {
             .signIn(email!, password!, context);
       } else {
         if (_pickedImage == null) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          'upload image',
+          style: TextStyle(color: Colors.white),
+          
+        ),
+        backgroundColor: Theme.of(context).errorColor,
+      ));
+
           setState(() {
             isLoading = false;
           });

@@ -71,9 +71,9 @@ class BaseProvider with ChangeNotifier {
     }
   }
 
-  void signOut() {
-    FirebaseAuth.instance.signOut();
-    _deleteLooginData();
+  void signOut() async {
+    await _deleteLooginData();
+    await FirebaseAuth.instance.signOut();
     notifyListeners();
   }
 
@@ -106,6 +106,15 @@ class BaseProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteText(String id) async {
+    try {
+      await FirebaseFirestore.instance.collection('texts').doc(id).delete();
+      notifyListeners();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   void switchTheme() {
     bIsDark = !bIsDark;
     _saveThemeData();
@@ -127,8 +136,12 @@ class BaseProvider with ChangeNotifier {
         .then((value) => value.setStringList('loogin', [email, password]));
   }
 
-  void _deleteLooginData() async {
-    await SharedPreferences.getInstance()
-        .then((value) => value.getStringList('loogin')!.clear());
+  Future<void> _deleteLooginData() async {
+    try {
+      SharedPreferences ref = await SharedPreferences.getInstance();
+      await ref.remove('loogin');
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }
